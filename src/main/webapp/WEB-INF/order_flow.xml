@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+ <var name="cartlist" class="thedressvilla.controller.ShoppingCartController"></var>
+ <on-start>
+ <evaluate expression="shoppingCartController.initFlow()"  result="flowScope.cartlist" />
+ </on-start>
+ 
+ <view-state id="start" view="order" model="flowscope.cartlist">
+ <transition on="submit" to="calladdress" />
+ </view-state>
+ 
+ <action-state id="calladdress">
+	<evaluate expression="shoppingCartController.getAddress()" result="flowScope.uaddress"></evaluate>
+	   <transition on="success" to="address"/>
+	</action-state>
+	
+	<view-state id="address" view="userAddress" model="flowScope.uaddress">
+	   <transition on="edit" to="start"/>
+	   <transition on="submit" to="insertAddress"/>
+	</view-state>
+	
+	<action-state id="insertAddress">
+	<evaluate expression="userController.insertAddress(flowScope.uaddress,messageContext)" result="flowScope.uaddress"></evaluate>
+	   <transition on="success" to="getAdd"/>
+	</action-state>
+	
+	
+	<action-state id="getAdd">
+	<evaluate expression="userController.getAdd()" result="flowScope.uaddress"></evaluate>
+	   <transition on="success" to="thankyou"/>
+	</action-state>
+	
+	
+	<view-state id="thankyou" view="thankYou" model="flowScope.uaddress">
+	   
+	   <transition on="submit" to="toHome"/>
+	</view-state>
+	<end-state id="toHome" view="externalRedirect:index" />
+	<!-- <end-state id="toException" view="externalRedirect:contextRelative:exception.jsp" /> -->
+ 
+	<!-- these events are available in every state-->
+	<global-transitions>
+		<transition on="home" to="index" />
+<!-- 		<transition on="error" to="toException" /> -->
+	</global-transitions>
+ 
+  </flow>                        
